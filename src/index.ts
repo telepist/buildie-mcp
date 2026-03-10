@@ -293,6 +293,52 @@ server.tool(
   }
 );
 
+server.tool(
+  "view_photo",
+  "View a photo image directly. Fetches the photo and returns it as an inline image.",
+  {
+    uuid: z.string().describe("Photo UUID"),
+  },
+  async ({ uuid }) => {
+    try {
+      const downloadResult = (await buildieFetch(
+        `/photo/${uuid}/download-url`
+      )) as { downloadUrl: string; data: { description: string; officialTime: string; filename: string } };
+
+      const imageResponse = await fetch(downloadResult.downloadUrl);
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to download image: ${imageResponse.status}`);
+      }
+
+      const buffer = await imageResponse.arrayBuffer();
+      const base64 = Buffer.from(buffer).toString("base64");
+
+      const contentType = imageResponse.headers.get("content-type") || "image/jpeg";
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Photo: ${downloadResult.data.description || downloadResult.data.filename}\nTaken: ${downloadResult.data.officialTime}`,
+          },
+          {
+            type: "image" as const,
+            data: base64,
+            mimeType: contentType,
+          },
+        ],
+      };
+    } catch (e) {
+      return {
+        content: [
+          { type: "text" as const, text: `Error: ${(e as Error).message}` },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
+
 // ── Tasks ─────────────────────────────────────────────────
 
 server.tool(
