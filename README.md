@@ -11,6 +11,7 @@ MCP (Model Context Protocol) server for [Buildie](https://buildie.fi) constructi
 | `list_photos` | List photos with filters (project, user, date, text search) |
 | `get_photo` | Get details of a single photo |
 | `get_photo_download_url` | Get a temporary download URL for a photo |
+| `view_photo` | View a photo directly as an inline image |
 | `list_tasks` | List tasks with filters (project, status, dates) |
 | `get_task` | Get details of a single task |
 | `list_reports` | List reports with filters (project, template, state, text search) |
